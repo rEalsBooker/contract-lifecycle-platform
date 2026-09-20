@@ -1,0 +1,4 @@
+package com.contractguard.platform.risk;
+import java.time.LocalDate; import java.time.LocalDateTime;
+public record RiskResponse(Long id,Long contractId,String contractNo,String contractName,String ruleCode,String objectType,Long objectId,String severity,String riskStatus,String factSummary,Long handlerMembershipId,String handlerName,String handlingPlan,LocalDate reviewDate,String ignoredReason,LocalDateTime createdAt,LocalDateTime updatedAt){public static RiskResponse from(RiskRow r){return new RiskResponse(r.getId(),r.getContractId(),r.getContractNo(),r.getContractName(),r.getRuleCode(),r.getObjectType(),r.getObjectId(),r.getSeverity(),r.getRiskStatus(),r.getFactSummary(),r.getHandlerMembershipId(),r.getHandlerName(),r.getHandlingPlan(),r.getReviewDate(),r.getIgnoredReason(),r.getCreatedAt(),r.getUpdatedAt());}}
+

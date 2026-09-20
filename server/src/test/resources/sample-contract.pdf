@@ -1,0 +1,11 @@
+%PDF-1.4
+% Contract Guard development fixture. This file is used only to exercise private upload and download flows.
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 0 >>
+endobj
+trailer
+<< /Root 1 0 R >>
+%%EOF

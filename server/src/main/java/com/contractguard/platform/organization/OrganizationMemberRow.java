@@ -1,0 +1,4 @@
+package com.contractguard.platform.organization;
+public class OrganizationMemberRow { private Long membershipId; private Long userId; private String username; private String displayName; private String membershipStatus; private String roleCodes;
+ public Long getMembershipId(){return membershipId;} public void setMembershipId(Long v){membershipId=v;} public Long getUserId(){return userId;} public void setUserId(Long v){userId=v;} public String getUsername(){return username;} public void setUsername(String v){username=v;} public String getDisplayName(){return displayName;} public void setDisplayName(String v){displayName=v;} public String getMembershipStatus(){return membershipStatus;} public void setMembershipStatus(String v){membershipStatus=v;} public String getRoleCodes(){return roleCodes;} public void setRoleCodes(String v){roleCodes=v;} }
+

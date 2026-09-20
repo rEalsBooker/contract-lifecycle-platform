@@ -1,0 +1,5 @@
+package com.contractguard.platform.fulfillment;
+import java.time.LocalDateTime;
+public class EvidenceReviewRow { private Long id; private Long taskId; private String taskTitle; private String submitNote; private String submitterName; private String originalFilename; private LocalDateTime submittedAt;
+ public Long getId(){return id;} public void setId(Long v){id=v;} public Long getTaskId(){return taskId;} public void setTaskId(Long v){taskId=v;} public String getTaskTitle(){return taskTitle;} public void setTaskTitle(String v){taskTitle=v;} public String getSubmitNote(){return submitNote;} public void setSubmitNote(String v){submitNote=v;} public String getSubmitterName(){return submitterName;} public void setSubmitterName(String v){submitterName=v;} public String getOriginalFilename(){return originalFilename;} public void setOriginalFilename(String v){originalFilename=v;} public LocalDateTime getSubmittedAt(){return submittedAt;} public void setSubmittedAt(LocalDateTime v){submittedAt=v;} }
+

@@ -1,0 +1,34 @@
+# Java
+server/target/
+*.class
+*.jar
+
+# Node
+web/node_modules/
+web/dist/
+.m2/
+.npm-cache/
+
+# Local configuration
+.env
+.env.*
+!.env.example
+web/.env.local
+server/src/main/resources/application-local.yml
+server/src/main/resources/application-prod.yml
+
+# IDE and temporary files
+.idea/
+.vscode/
+scratch/
+*.log
+
+# Runtime data and local uploads
+data/
+uploads/
+storage/
+*.db
+
+# Operating system files
+Thumbs.db
+Desktop.ini

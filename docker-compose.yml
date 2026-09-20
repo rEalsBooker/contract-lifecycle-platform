@@ -1,0 +1,64 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: contract-lifecycle-mysql
+    environment:
+      MYSQL_DATABASE: contract_lifecycle
+      MYSQL_USER: contract_app
+      MYSQL_PASSWORD: contract_app_dev
+      MYSQL_ROOT_PASSWORD: root_dev_only
+    ports:
+      - "3307:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: contract-lifecycle-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: contract-lifecycle-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: contract_app
+      RABBITMQ_DEFAULT_PASS: contract_app_dev
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: contract-lifecycle-minio
+    environment:
+      MINIO_ROOT_USER: contract_app
+      MINIO_ROOT_PASSWORD: contract_app_dev_minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  qdrant:
+    image: qdrant/qdrant:v1.15.4
+    container_name: contract-lifecycle-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+
+volumes:
+  mysql-data:
+  redis-data:
+  rabbitmq-data:
+  minio-data:
+  qdrant-data:

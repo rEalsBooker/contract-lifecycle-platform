@@ -1,0 +1,10 @@
+package com.contractguard.platform.fulfillment;
+import org.apache.ibatis.annotations.*;
+@Mapper public interface EvidenceMapper {
+ @Insert("INSERT INTO evidence_submissions(tenant_id,task_id,file_id,submitter_membership_id,reviewer_membership_id,submit_note,review_status) VALUES(#{t},#{task},#{file},#{submitter},#{reviewer},#{note},'PENDING_REVIEW')") void insert(@Param("t")Long t,@Param("task")Long task,@Param("file")Long file,@Param("submitter")Long submitter,@Param("reviewer")Long reviewer,@Param("note")String note);
+ @Select("SELECT task_id FROM evidence_submissions WHERE tenant_id=#{t} AND id=#{id} AND reviewer_membership_id=#{reviewer} AND review_status='PENDING_REVIEW'") Long taskForReview(@Param("t")Long t,@Param("id")Long id,@Param("reviewer")Long reviewer);
+ @Update("UPDATE evidence_submissions SET review_status=#{status},review_note=#{note},reviewed_at=NOW(3) WHERE tenant_id=#{t} AND id=#{id} AND review_status='PENDING_REVIEW'") int review(@Param("t")Long t,@Param("id")Long id,@Param("status")String status,@Param("note")String note);
+ @Select("SELECT e.id,e.task_id,t.title AS task_title,e.submit_note,u.display_name AS submitter_name,f.original_filename,e.submitted_at FROM evidence_submissions e JOIN fulfillment_tasks t ON t.id=e.task_id JOIN memberships m ON m.id=e.submitter_membership_id JOIN app_users u ON u.id=m.user_id JOIN file_objects f ON f.id=e.file_id AND f.tenant_id=e.tenant_id WHERE e.tenant_id=#{t} AND e.reviewer_membership_id=#{reviewer} AND e.review_status='PENDING_REVIEW' ORDER BY e.submitted_at") java.util.List<EvidenceReviewRow> pending(@Param("t")Long t,@Param("reviewer")Long reviewer);
+ @Select("SELECT e.id AS evidence_id,f.storage_key,f.original_filename,f.content_type FROM evidence_submissions e JOIN file_objects f ON f.id=e.file_id AND f.tenant_id=e.tenant_id WHERE e.tenant_id=#{tenantId} AND e.id=#{evidenceId} AND (e.submitter_membership_id=#{membershipId} OR e.reviewer_membership_id=#{membershipId})") EvidenceFileRow findAccessibleFile(@Param("tenantId")Long tenantId,@Param("evidenceId")Long evidenceId,@Param("membershipId")Long membershipId);
+}
+

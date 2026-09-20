@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: contract-lifecycle-server
+  profiles:
+    default: dev
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD:change-me-db-password}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    time-zone: Asia/Shanghai
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 21MB
+  rabbitmq:
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 2s
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:change-me-jwt-secret-for-local-only}
+    expiration-minutes: 120
+  storage:
+    provider: ${APP_STORAGE_PROVIDER:local}
+    local-root: ${APP_STORAGE_LOCAL_ROOT:./data/private-files}
+    endpoint: ${APP_STORAGE_MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${APP_STORAGE_MINIO_ACCESS_KEY:contract_app}
+    secret-key: ${APP_STORAGE_MINIO_SECRET_KEY:change-me-minio-secret}
+    bucket: ${APP_STORAGE_MINIO_BUCKET:contract-private-files}
+  messaging:
+    mode: ${APP_MESSAGING_MODE:database}
+  ai:
+    provider: ${APP_AI_PROVIDER:qwen}
+    api-key: ${APP_AI_API_KEY:}
+    model-name: ${APP_AI_MODEL_NAME:qwen3.8-flash}
+    base-url: ${APP_AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+    timeout-seconds: ${APP_AI_TIMEOUT_SECONDS:120}
+    rag:
+      enabled: ${APP_AI_RAG_ENABLED:true}
+      embedding-model-name: ${APP_AI_EMBEDDING_MODEL_NAME:text-embedding-v4}
+      embedding-dimensions: ${APP_AI_EMBEDDING_DIMENSIONS:1024}
+      chunk-size: ${APP_AI_RAG_CHUNK_SIZE:1200}
+      chunk-overlap: ${APP_AI_RAG_CHUNK_OVERLAP:200}
+      top-k: ${APP_AI_RAG_TOP_K:4}
+      min-score: ${APP_AI_RAG_MIN_SCORE:0.55}
+      fallback-enabled: ${APP_AI_RAG_FALLBACK_ENABLED:true}
+      qdrant-url: ${APP_AI_QDRANT_URL:http://localhost:6333}
+      collection-name: ${APP_AI_QDRANT_COLLECTION:contract_chunks}
+    agent:
+      enabled: ${APP_AI_AGENT_ENABLED:true}

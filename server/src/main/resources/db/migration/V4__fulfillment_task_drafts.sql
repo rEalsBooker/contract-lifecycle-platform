@@ -1,0 +1,23 @@
+CREATE TABLE fulfillment_tasks (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id BIGINT NOT NULL,
+    contract_id BIGINT NOT NULL,
+    source_clause_id BIGINT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    task_description TEXT NULL,
+    task_status VARCHAR(32) NOT NULL,
+    task_origin VARCHAR(32) NOT NULL,
+    due_date DATE NULL,
+    assignee_membership_id BIGINT NULL,
+    created_by_membership_id BIGINT NOT NULL,
+    completed_at DATETIME(3) NULL,
+    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    UNIQUE KEY uk_fulfillment_tasks_clause (tenant_id, contract_id, source_clause_id),
+    KEY idx_fulfillment_tasks_assignee (tenant_id, assignee_membership_id, task_status, due_date),
+    CONSTRAINT fk_tasks_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id),
+    CONSTRAINT fk_tasks_contract FOREIGN KEY (contract_id) REFERENCES contracts(id),
+    CONSTRAINT fk_tasks_clause FOREIGN KEY (source_clause_id) REFERENCES contract_clauses(id),
+    CONSTRAINT fk_tasks_assignee FOREIGN KEY (assignee_membership_id) REFERENCES memberships(id),
+    CONSTRAINT fk_tasks_creator FOREIGN KEY (created_by_membership_id) REFERENCES memberships(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
