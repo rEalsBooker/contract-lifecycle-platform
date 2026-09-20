@@ -1,8 +1,10 @@
 # 契约智控
 
+[![CI](https://github.com/rEalsBooker/contract-lifecycle-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/rEalsBooker/contract-lifecycle-platform/actions/workflows/ci.yml)
+
 > 企业合同履约与回款风险管理平台
 
-契约智控是一个面向企业项目合同的 B2B SaaS 管理平台，也是一个用于展示 Java 后端、AI 应用落地和完整 AI Coding 流程的个人项目。
+契约智控是一个面向企业项目合同的 B2B SaaS 管理平台，由个人独立开发，用于实践 Java 后端、AI 应用落地和完整的软件工程流程。
 
 它不只保存合同文件，而是把合同中的付款、交付、验收、开票和续签约定转化为可跟踪的履约任务，并持续记录凭证、回款和风险状态。
 
@@ -11,6 +13,57 @@
 企业签订合同后，真正容易发生的问题通常不是“合同找不到”，而是：付款节点无人跟进、交付或验收延期、履约凭证缺失，以及回款逾期后没有及时升级处理。
 
 本项目围绕“合同条款 → 履约任务 → 凭证审核 → 回款跟踪 → 风险预警”建立业务闭环。
+
+## 系统架构
+
+```mermaid
+flowchart LR
+    Web[Vue 3 管理端] --> API[Spring Boot REST API]
+    API --> Security[Security / JWT / Workspace]
+    API --> Contract[Contract 合同与版本]
+    API --> Fulfillment[Fulfillment 履约任务与凭证]
+    API --> Finance[Receivable / Risk 回款与风险]
+    API --> AI[AI / RAG / Agent]
+    Contract --> MySQL[(MySQL + Flyway)]
+    Fulfillment --> MySQL
+    Finance --> MySQL
+    API --> Outbox[Transactional Outbox]
+    Outbox --> Rabbit[RabbitMQ 通知投递]
+    Contract --> MinIO[(MinIO 私有文件)]
+    AI --> Qdrant[(Qdrant 向量检索)]
+```
+
+## 权限调用链
+
+```mermaid
+flowchart LR
+    Login[Login] --> Identity[Identity Token]
+    Identity --> Workspace[Workspace 选择]
+    Workspace --> WorkspaceToken[Workspace Token]
+    WorkspaceToken --> Tenant[tenant_id]
+    Tenant --> Membership[Membership / Role]
+    Membership --> ObjectPermission[合同对象权限]
+    ObjectPermission --> Service[业务 Service 再次校验]
+    Service --> Data[(合同、任务、回款、风险数据)]
+```
+
+所有合同、任务、文件、凭证、回款和风险查询都必须带租户上下文，并在 Service 或 Mapper 查询边界继续校验 Membership 和对象权限。
+
+## AI 调用链
+
+```mermaid
+flowchart LR
+    File[PDF / DOCX] --> Parse[文本解析与页码标记]
+    Parse --> Chunk[Contract Chunk]
+    Chunk --> Embedding[Embedding]
+    Embedding --> Qdrant[Qdrant Top-K 召回]
+    Qdrant --> Tools[Contract Agent Tools]
+    Tools --> LLM[Qwen LLM]
+    LLM --> Answer[结构化回答 + 来源引用]
+    Answer --> Human[人工确认 / 修改]
+```
+
+AI 解析、问答和风险提示都属于辅助能力。模型输出会保留来源依据，并通过当前用户的合同权限限制可查询的数据范围。
 
 ## 核心业务闭环
 
@@ -201,7 +254,7 @@ docker compose --env-file .env up -d
 
 ```powershell
 cd server
-.\mvnw.cmd spring-boot:run
+mvn spring-boot:run
 ```
 
 也可以在 IntelliJ IDEA 中运行 `ContractLifecycleApplication`。
@@ -233,7 +286,7 @@ npm run dev
 
 ```powershell
 cd server
-.\mvnw.cmd test
+mvn test
 ```
 
 前端构建：
@@ -256,9 +309,18 @@ GET http://localhost:8080/api/v1/health
 - [UI 原型说明](docs/ui-prototype-brief-v0.1.md)
 - [技术设计](docs/technical-design-v0.1.md)
 
+## 运行截图
+
+当前仓库暂未提交截图素材，不在 README 中虚构图片。后续如果需要补充演示截图，建议手工截取：
+
+- 企业工作台：任务完成率、应收余额和风险摘要；
+- 合同详情 / AI 解析：来源页码、人工修改和确认入口；
+- 履约任务：执行人、审核人、凭证审核和驳回重提；
+- 回款与风险：应收计划、逾期状态和风险处置。
+
 ## 项目边界
 
-- 当前是个人 AI Coding 求职展示项目，不代表真实企业生产系统；
+- 当前是个人独立开发项目，不代表真实企业生产系统；
 - AI 结果必须经过人工确认，不作为法律意见；
 - 示例合同和账号仅用于本地演示；
 - 当前优先保证模块化单体的业务闭环，不为展示技术而强行引入微服务；

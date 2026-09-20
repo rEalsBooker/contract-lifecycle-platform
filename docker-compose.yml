@@ -3,15 +3,20 @@ services:
     image: mysql:8.4
     container_name: contract-lifecycle-mysql
     environment:
-      MYSQL_DATABASE: contract_lifecycle
-      MYSQL_USER: contract_app
-      MYSQL_PASSWORD: contract_app_dev
-      MYSQL_ROOT_PASSWORD: root_dev_only
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-contract_lifecycle}
+      MYSQL_USER: ${MYSQL_USER:-contract_app}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD:-development-db-password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-development-root-password}
     ports:
       - "3307:3306"
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7-alpine
@@ -21,25 +26,35 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   rabbitmq:
     image: rabbitmq:3.13-management
     container_name: contract-lifecycle-rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: contract_app
-      RABBITMQ_DEFAULT_PASS: contract_app_dev
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-contract_app}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-development-rabbit-password}
     ports:
       - "5672:5672"
       - "15672:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   minio:
     image: quay.io/minio/minio:latest
     container_name: contract-lifecycle-minio
     environment:
-      MINIO_ROOT_USER: contract_app
-      MINIO_ROOT_PASSWORD: contract_app_dev_minio
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-contract_app}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-development-minio-password}
     command: server /data --console-address ":9001"
     ports:
       - "9000:9000"
