@@ -26,7 +26,6 @@ scratch/
 # Runtime data and local uploads
 data/
 uploads/
-storage/
 *.db
 
 # Operating system files
